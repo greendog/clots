@@ -96,14 +96,10 @@ module Clot
     def set_controller_action
       silence_warnings {
         if @model.nil? || @model.source.nil?
-          @activity = "new"
-        elsif @model.dropped_class == Searchlogic::Search
-          @activity = "search"
+         # @activity = "new"
         elsif @form_object.include?("_change")
           @activity = "change"
         elsif @model.source.new_record? ||  @model.source.id.nil?
-          @activity = "new"
-        elsif @model.dropped_class == NationSignup
           @activity = "new"
         else
           @activity = "edit"
