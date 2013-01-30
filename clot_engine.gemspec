@@ -1,8 +1,8 @@
 require 'rake'
 
 Gem::Specification.new do |s|
-  s.name = 'clot'
-  s.summary = "Clot"
+  s.name = 'clot_engine'
+  s.summary = "Clot Engine"
   s.authors = ["Jim Gilliam, Alexander Negoda"]
   s.email = ["alexander.negoda@gmail.com"]
   s.description = "Extensions for solidifying Liquid Templates"

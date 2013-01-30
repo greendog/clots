@@ -1,14 +1,12 @@
 module Clot
   module UrlFilters
 
-   # include ActionView::Helpers::TagHelper
-
     #get url from object
     def object_url(target, class_name = "")
       if (class_name.blank?)
         class_name = target.dropped_class.to_s.tableize
       end
-      '/forms/' + class_name + "/" + target.id.to_s
+      class_name + "/" + target.id.to_s
     end
 
     #get url from object and nested object
