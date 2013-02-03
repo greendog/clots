@@ -1,19 +1,3 @@
-#require 'clot/active_record/droppable'
-#require 'clot/base_drop'
-#require 'clot/content_for'
-#require 'clot/date_tags'
-#require 'clot/deprecated'
-#require 'clot/form_for'
-#require 'clot/form_tag'
-#require 'clot/model_date_tags'
-#require 'clot/model_form_tags'
-#require 'clot/mongo_mapper/droppable'
-#require 'clot/no_model_form_tags'
-#require 'clot/url_filters'
-#require 'clot/yield'
-#require 'extras/liquid_view'
-#require 'mongo_mapper'
-
 module Clot
   class Engine < Rails::Engine
     isolate_namespace Clot::Engine
@@ -21,8 +5,22 @@ module Clot
     engine_name :clot
 
     def self.activate
-      Dir.glob(File.join(File.dirname(__FILE__), "clot/**/*.rb")) do |c|
-        Rails.configuration.cache_classes ? require(c) : load(c)
+      %w(
+          clot/active_record/droppable.rb
+          clot/base_drop.rb
+          clot/if_content_for.rb
+          clot/date_tags.rb
+          clot/deprecated.rb
+          clot/form_for.rb
+          clot/form_tag.rb
+          clot/model_date_tags.rb
+          clot/model_form_tags.rb
+          clot/mongo_mapper/droppable.rb
+          clot/no_model_form_tags.rb
+          clot/url_filters.rb
+          clot/yield.rb
+      ).each do |c|
+        Rails.configuration.cache_classes ? require(File.join(Clot::Engine.root, 'lib', c)) : load(File.join(Clot::Engine.root, 'lib', c))
       end
 
       Liquid::Template.register_filter Clot::UrlFilters
@@ -71,7 +69,7 @@ module Clot
       Liquid::Template.register_tag('datetime_select', Clot::DatetimeSelect)
 
       ::ActiveRecord::Base.send(:include, Clot::ActiveRecord::Droppable)
-      ::MongoMapper::Document.send(:include, Clot::MongoMapper::Droppable)
+      #::MongoMapper::Document.send(:include, Clot::MongoMapper::Droppable)
     end
 
     config.to_prepare &method(:activate).to_proc
