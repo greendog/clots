@@ -45,7 +45,7 @@ module Clot
 
     def initialize(source)
       @source = source
-      @liquid = liquid_attributes.inject({}) { |h, k| h.update k.to_s => @source.send(k) }
+      @liquid = self.liquid_attributes.inject({}) { |h, k| h.update k.to_s => @source.send(k) }
     end
 
     def before_method(method)

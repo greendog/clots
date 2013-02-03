@@ -62,7 +62,6 @@ module Clot
     def set_variables(context)
       set_controller_action
       set_form_action(context)
-      set_class
       set_upload
     end
 
@@ -99,11 +98,13 @@ module Clot
         @attributes['html'] = eval(@attributes['html'].chomp('"').reverse.chomp('"').reverse)
       end
 
-      @attributes = @attributes.except('url_helper').except('url_helper_params')
+      @attributes.except!('url_helper').except!('url_helper_params')
 
-      context.registers[:action_view].form_for(context[@form_object].source, @attributes.symbolize_keys)do |form|
+      item = context[@form_object].to_sym if context[@form_object].is_a?(String)
+      item = context[@form_object].source if context[@form_object].is_a?(Liquid::Drop)
+
+      context.registers[:action_view].form_for(item, @attributes.symbolize_keys) do |form|
         set_model(context)
-        set_class
         set_upload
         context.stack do
           context['form'] = form
@@ -120,7 +121,7 @@ module Clot
         context['form_errors'] = []
         @model.errors.each do |attr, msg|
           context['form_errors'] << attr
-        end
+        end if @model.respond_to? :errors
         return render_all(@nodelist, context)
       end
     end
@@ -160,18 +161,6 @@ module Clot
       end
     end
 
-    def set_class
-      @class_string = ""
-      unless @attributes["class"].nil?
-        @class_string += 'class="' + @attributes["class"] + '" '
-      end
-      unless @attributes["autocomplete"].nil?
-        @class_string += 'autocomplete="' + @attributes["autocomplete"] + '" '
-      end
-
-      @class_name = drop_class_to_table_item @model.class
-    end
-
     def set_model(context)
       @model = context[@form_object] || nil
       if not @model
@@ -183,19 +172,6 @@ module Clot
       end
     end
 
-    def get_form_header(context)
-      cs = @class_name + "_form"
-      method_type = "POST"
-      result = '<form class="' + cs + '" method="' + method_type + '" ' + @class_string + 'action="' + @form_action + '"' + @upload_info + '>'
-
-      if @activity == "edit"
-        result += '<input type="hidden" name="_method" value="PUT"/>'
-      end
-
-      result += "<input name=\"authenticity_token\" type=\"hidden\" value=\"#{context.registers[:action_view].form_authenticity_token}\"/>"
-
-      result
-    end
 
     def set_variables(context)
       set_model(context)
@@ -220,7 +196,7 @@ module Clot
       @model = context[@params.shift]
 
       result = ""
-      if @model and @model.errors.count > 0
+      if @model and @model.respond_to?(:errors) and @model.errors.count > 0
         @suffix = @model.errors.count > 1 ? "s" : ""
         @default_message = @model.errors.count.to_s + " error#{@suffix} occurred while processing information"
 
@@ -238,7 +214,7 @@ module Clot
 
         @model.errors.each do |attr, msg|
           result += "<li>#{error_message(attr, msg)}</li>"
-        end
+        end if @model.respond_to? :errors
 
         result += "</ul></div>"
       end
