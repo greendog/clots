@@ -1,21 +1,22 @@
+#!/usr/bin/env rake
 require 'rake'
-require 'rake/rdoctask'
-require 'spec/rake/spectask'
+require 'rake/testtask'
+require 'rake/packagetask'
+require 'rubygems/package_task'
 
-desc 'Default: run specs.'
 task :default => :spec
 
-desc 'Run the specs'
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_opts = ['--colour --format progress --loadby mtime --reverse']
-  t.spec_files = FileList['spec/**/*_spec.rb']
+spec = eval(File.read('clot_engine.gemspec'))
+
+Gem::PackageTask.new(spec) do |p|
+  p.gem_spec = spec
 end
 
-desc 'Generate documentation for the clot plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Clot'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
+
+
+
