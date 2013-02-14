@@ -7,6 +7,7 @@ module Clot
     def resolve_value(value,context)
       case value
         when /^([\[])(.*)([\]])$/ then array =  $2.split " "; array.map { |item| resolve_value item, context }
+        when /^"(\{.*\})"$/ then eval($1) # hash from string
         when /^(["'])(.*)\1$/ then $2
         when /^(\d+[\.]\d+)$/ then $1.to_f
         when /^(\d+)$/ then value.to_i

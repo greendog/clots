@@ -46,24 +46,31 @@ module Clot
   end
 
   class ClotTag < Liquid::Tag
+    Syntax = /([^\s]+)\s+/
+
     include AttributeSetter
     include TagHelper
-    def initialize(name, params, tokens)
-      @_params = split_params(params)
+
+    def initialize(tag_name, markup, tokens)
+      if markup =~ Syntax
+        @form_object = $1
+        @attributes = {}
+        markup.scan(Liquid::TagAttributes) do |key, value|
+          @attributes[key] = value
+        end
+      else
+        syntax_error tag_name, markup, tokens
+      end
       super
     end
 
     def render(context)
-
-
-      instance_variables.map(&:to_sym).each do |var|
-        unless [:@_params, :@markup, :@tag_name].include? var
-          instance_variable_set var, nil  #this is because the same parse tag is re-rendered
-        end
+      @attributes.each do |key, value|
+        @attributes[key] = resolve_value(value, context)
       end
-      @params = @_params.clone
-      set_attributes(context)
-      render_string
+
+      @form_object = context[@form_object].to_sym if context[@form_object].is_a?(String)
+      @form_object = context[@form_object].source if @form_object.nil? && context[@form_object].is_a?(Liquid::Drop)
     end
 
   end

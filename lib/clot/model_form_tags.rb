@@ -50,14 +50,8 @@ module Clot
     end
 
     def render(context)
-      result = super(context)
-      #if @errors.include? @attribute_name
-      #  result = "<div class=\"fieldWithErrors\">#{result}</div>"
-      #end
-      result
+      super(context)
     end
-
-
 
   end
 
@@ -99,84 +93,22 @@ module Clot
   end
 
   class CollectionSelect < ClotTag
-    include ModelTag
-    def set_primary_attributes(context)
-      super context
-      if @params[0] && ! @params[0].match(/:/)
-         @collection = resolve_value(@params.shift,context)
-      end
-      @default_id = 'id'
-      @default_name = 'name'
-      if @params[0] && ! @params[0].match(/:/)
-         @default_id = resolve_value(@params.shift,context)
-      end
-      if @params[0] && ! @params[0].match(/:/)
-         @default_name = resolve_value(@params.shift,context)
-      end
-    end
+    # usage:
+    # {% collection_select "order[bill_address_attributes]" method:"country_id", collection:available_countries, value_method:'id', text_method:'name', html_options:"{class:'large-field'}" %}
 
-    def gen_option(item)
-      selection_string = ""
-      item_string = item
-      value_string = ""
+    def render(context)
+      super(context)
 
-      # this line below is for BSON::ObjectId which doesn't respond to :id, but does :_id
-      @default_id = "_id" if @default_id == 'id' and item.respond_to?(:_id)
+      # collection_select(object, method, collection, value_method, text_method, options = {}, html_options = {})
+      method = @attributes['method']
+      collection = @attributes['collection']
+      value_method = @attributes['value_method']
+      text_method = @attributes['text_method']
+      @attributes.has_key?('options') ? options = @attributes['options'] : options = {}
+      @attributes.has_key?('html_options') ? html_options = @attributes['html_options'] : html_options = {}
 
-      # @item = NationSignupDrop
-      # item = NationPlan
 
-      attribute_names = @attribute_name.split('.')
-
-      if item.is_a?(String) || item.is_a?(Fixnum) || item.is_a?(Float)
-        if (@item[@attribute_name.to_sym].to_s == item.to_s) || (@item.respond_to?(@attribute_name.to_sym) && @item.send(@attribute_name.to_sym).to_s == item.to_s)
-          selection_string = ' selected="selected"'
-        end
-      else
-        item_string = item[@default_name.to_sym] || (@item.respond_to?(@attribute_name.to_sym) && @item.send(@default_name.to_sym))
-        value_string = %{ value="#{item[@default_id.to_sym]}"}
-        if @item.class.to_s == "NationSignupDrop" and attribute_names.size == 3 and attribute_names[0] == 'payment_profile' # this is a special case just for 3dna nation signup mongo stuff
-          if attribute_names[1] == 'billing_address'
-            if item[@default_id.to_sym].to_s == @item.source.payment_profile.billing_address[attribute_names[2].to_sym].to_s
-              selection_string = ' selected="selected"'
-            end
-          else
-            if item[@default_id.to_sym].to_s == @item.source.payment_profile[attribute_names[1].to_sym][attribute_names[2].to_sym].to_s
-              selection_string = ' selected="selected"'
-            end
-          end
-        elsif attribute_names.size == 3
-          if item[@default_id.to_sym].to_s == @item[attribute_names[0].to_sym][attribute_names[1].to_sym][attribute_names[2].to_sym].to_s
-            selection_string = ' selected="selected"'
-          end
-        elsif attribute_names.size == 2
-          if item[@default_id.to_sym].to_s == @item[attribute_names.first.to_sym][attribute_names.last.to_sym].to_s
-            selection_string = ' selected="selected"'
-          end
-        else
-          if item[@default_id.to_sym].to_s == @item[@attribute_name.to_sym].to_s
-            selection_string = ' selected="selected"'
-          end
-        end
-      end
-
-      "<option#{value_string}#{selection_string}>#{item_string}</option>"
-    end
-
-    def personal_attributes(name,value)
-      case name
-        when 'prompt' then
-          @prompt_option = %{<option value="">#{value}</option>}
-      end
-    end
-
-    def render_string
-      @option_string = "#{@prompt_option}"
-      @collection.each do |item|
-        @option_string << gen_option(item)
-      end
-
-      %{<select id="#{@id_string}" name="#{@name_string}">#{@option_string}</select>}
+      context.registers[:action_view].collection_select(@form_object, method, collection, value_method, text_method, options, html_options)
     end
   end
 
