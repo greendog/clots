@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.version = "1.2.0"
   s.files = FileList["lib/**/*.rb"].to_a
 
-  s.add_dependency 'mongo_mapper', '>= 0.12.0'
+  #s.add_dependency 'mongo_mapper', '>= 0.12.0'
 
 end

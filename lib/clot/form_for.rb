@@ -20,7 +20,7 @@ module Clot
           @attributes[key] = value
         end
       else
-        syntax_error tag_name, markup, tokens
+        syntax_error# tag_name, markup, tokens
       end
       super
     end
@@ -81,7 +81,7 @@ module Clot
           @attributes[key] = value
         end
       else
-        syntax_error tag_name, markup, tokens
+        syntax_error# tag_name, markup, tokens
       end
       super
     end
@@ -91,7 +91,11 @@ module Clot
       if @attributes.has_key?('url_helper')
         Protected.config = context.registers[:controller]
         @attributes['url'] = Protected.send(@attributes['url_helper'].to_sym) unless @attributes.has_key?('url_helper_params')
-        @attributes['url'] = Protected.send(@attributes['url_helper'].to_sym, context[@attributes['url_helper_params']].source) if @attributes.has_key?('url_helper_params')
+        if params = context[@attributes['url_helper_params']]
+          arg = params.is_a?(String) ? params : params.source
+          @attributes['url'] = Protected.send(@attributes['url_helper'].to_sym, arg)
+        end
+
       end
 
       if @attributes.has_key?('html')
