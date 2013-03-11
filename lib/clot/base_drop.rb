@@ -88,8 +88,8 @@ module Clot
       @source.errors
     end
 
-    def collection_label
-      "label field"
+    def new_record
+      @source.new_record?
     end
 
     def self.method_missing(symbol, *args)
