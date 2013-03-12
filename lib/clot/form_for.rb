@@ -199,7 +199,6 @@ module Clot
       @params = @_params.clone
       @model = context[@params.shift]
 
-      result = ""
       if @model and @model.respond_to?(:errors) and @model.errors.count > 0
         @suffix = @model.errors.count > 1 ? "s" : ""
         @default_message = @model.errors.count.to_s + " error#{@suffix} occurred while processing information"
@@ -214,25 +213,11 @@ module Clot
           end
         end
 
-        result += '<div class="errorExplanation" id="errorExplanation"><h2>' + @default_message + '</h2><ul>'
+        readable_errors = @model.errors.map{ |target, msg| "#{target}: #{msg}" }
 
-        @model.errors.each do |attr, msg|
-          result += "<li>#{error_message(attr, msg)}</li>"
-        end if @model.respond_to? :errors
-
-        result += "</ul></div>"
-      end
-      result
-    end
-
-    def error_message(attr, msg)
-      unless attr == :base
-        "#{attr} - #{msg}"
-      else
-        msg
+        { :message => @default_message, :errors => readable_errors }.to_json
       end
     end
-
   end
 
 end
