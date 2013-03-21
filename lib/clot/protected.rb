@@ -5,9 +5,10 @@ module Protected
 
 
   class << self
-    include Rails.application.routes.url_helpers
-    include Refinery::Core::Engine.routes.url_helpers
-    include Spree::Core::Engine.routes.url_helpers
+    #include Spree::Core::Engine.routes.url_helpers
+    #include Refinery::Core::Engine.routes.url_helpers
+    #include Rails.application.routes.url_helpers
+    #include ActionView::Helpers::UrlHelper
 
     def config=(controller)
       @controller = controller
@@ -21,5 +22,4 @@ module Protected
       @controller
     end
   end
-
 end
