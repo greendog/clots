@@ -154,4 +154,4 @@ We have tried to write tests for all aspects of our plugin.  Reading the tests i
 
 We support Ruby 1.8.7 and 1.9.1
 
-Copyright (c) 2008 Ludicast
+Copyright (c) 2008 Ludicast. Alexander Negoda
