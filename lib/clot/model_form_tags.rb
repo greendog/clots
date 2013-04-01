@@ -3,7 +3,6 @@ module Clot
     def set_primary_attributes(context)
       @item = context['form_model']
       if @item
-
         @attribute_name =  resolve_value(@params.shift,context)
         @first_attr = context['form_class_name']
       else
