@@ -27,7 +27,8 @@ module Clot
         when /^(.+)_path$/ then
           "/#{$1}"
         else
-          context[value]
+          result = context[value]
+          result.is_a?(Liquid::Drop) ? result.source : result
       end
     end
 
