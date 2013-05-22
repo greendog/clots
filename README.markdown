@@ -1,3 +1,5 @@
+[![Code Climate](https://codeclimate.com/github/shoponrails/clots.png)](https://codeclimate.com/github/shoponrails/clots)
+
 # Clots
 
 This project seeks to implement extensions for liquid whereby it has the power of other template libraries.
