@@ -89,69 +89,10 @@ If there were errors, they would both appear at the top of the form and wrap the
 
 Note that the interface to this changed and we are currently documenting the improvements.
 
+TODOs
+=====
 
-## BaseDrop Class
-
-In order for everything to work correctly, it is necessary that your drops inherit from our Clots::BaseDrop class.  BaseDrop is pretty much ripped out of the Mephisto project.
-
-Your Drops inheriting from it can then add additional attributes, just like in Mephisto:
-
-    class BookDrop < Clot::Base
-        liquid_attributes << :title << :author_id << :genre_id
-    end
-
-would provide a drop with access to the title, author_id and genre properties of the underlying ActiveRecord.
-
-We also added a few extra methods to the BaseDrop class (as well as taking some out that were specific to Mephisto):
-
-    def id
-      @source.id
-    end
-
-    def dropped_class
-      @source.class
-    end
-
-    def errors
-      @source.errors
-    end
-
-This is necessary for having the BaseDrop and its subclasses interact properly with our form builder and filters.  You would probably be fine just adding these methods to your current drops as well - they are just useful for the form builder and other tools.
-
-In addition, drops may have has_many and belongs_to options which create the usual association methods that delegate to your internal class.
-
-## to_liquid added to ActiveRecord::Base
-
-We made the to_liquid method a little DRYer, favoring convention over configuration.  to_liquid is now automatically added to the ActiveRecord::Base class, and - unless overridden - works as follows:
-
-a) When to_liquid is called on a model, it searches for a class of the same name with "Drop" appended to it. (obviously you'd have to have a drop folder somewhere in your path)
-b) In cases of Single-Table-Inheritance, it follows the inheritance chain until it finds the appropriate drop.  So if you have an Admin model that inherits from a User model, will use UserDrop if no AdminDrop exists.
-c) It then instantiates the appropriate drop class, with the active record as a parameter to the drop's constructor.
-
-We thought this would be better than explicitly throwing to_liquid into the model through my "acts_as_liquid" or explicitly adding "to_liquid" to each model.  Philosophically speaking, we don't think models should contain any code that exists only to deal with the views.
-
-## content_for and yield tags
-
-Tags have been defined to provide similar functionality to rail's 'content_for' and 'yield' statements.
-
-The 'yield' tag is similar in function to liquid's 'include' tag, however the template name is automagically prefixed with the current controller and view directories.  This means that rather than defining a content_for tag in a view, the tag should be placed in a sub-folder of the view named after the action it will be called from.  Using the yield tag without any arguments will insert the content_for_layout variable, so it can be used the same as a typical yield statement.
-
-The if_content_for block simply checks to see if a given template file exists and then outputs its contentents if so.
-
-In order to use either of these tags (or the include tag) something similar to this will need to be added as a before_filter on your controller
-
-    Liquid::Template.file_system = Liquid::LocalFileSystem.new( MyController.view_paths )
-
-## Filters for RESTful routes
-
-We added some filters for restful routes.  These are contained within the url_filters directory.
-
-## Test Cases
-
-We have tried to write tests for all aspects of our plugin.  Reading the tests is a good way to learn about how everything works.
-
-## Ruby Versions
-
-We support Ruby 1.8.7 and 1.9.1
+* Major code cleanup
+* Tests
 
 Copyright (c) 2008 Ludicast. Alexander Negoda
